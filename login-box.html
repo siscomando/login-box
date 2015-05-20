@@ -25,12 +25,15 @@ and password).
     <h2>{{heading}}</h2>
     <content select="[top]"></content>
     <content select="[identifierHeading]"></content>
-    <paper-input id="identifierInput" value="{{identifier}}" label="{{identification}}" floatingLabel></paper-input>
+    
+    <!-- <paper-input id="identifierInput" value="{{identifier}}" label="{{identification}}" floatingLabel></paper-input>-->
+
+    <paper-input-decorator label="E-mail" floatingLabel>
+      <input is="core-input" type="email" id="identifierInput" value="{{identifier}}" label="E-mail" floatingLabel>
+    </paper-input-decorator>    
+    
     <content select="[passwordHeading]"></content>
     
-    <!--
-    <paper-input id="passwordInput" value="{{password}}" label="password" type="password"></paper-input>
-    -->
     <paper-input-decorator label="Password" floatingLabel>
       <input is="core-input" type="password" id="passwordInput" value="{{password}}" label="password">
     </paper-input-decorator>
