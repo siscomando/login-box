@@ -17,7 +17,7 @@ and password).
 @status alpha
 @homepage http://polymerlabs.github.io/login-box
 -->
-<polymer-element name="login-box" attributes="heading identification submit action">
+<polymer-element name="login-box" attributes="heading identification submit action ajax url">
 
   <template>
     <script type="text/javascript" src="web-animations.js"></script>
@@ -25,15 +25,15 @@ and password).
     <h2>{{heading}}</h2>
     <content select="[top]"></content>
     <content select="[identifierHeading]"></content>
-    
+
     <!-- <paper-input id="identifierInput" value="{{identifier}}" label="{{identification}}" floatingLabel></paper-input>-->
 
     <paper-input-decorator label="E-mail" floatingLabel>
       <input is="core-input" type="email" id="identifierInput" value="{{identifier}}" label="E-mail" floatingLabel>
-    </paper-input-decorator>    
-    
+    </paper-input-decorator>
+
     <content select="[passwordHeading]"></content>
-    
+
     <paper-input-decorator label="Password" floatingLabel>
       <input is="core-input" type="password" id="passwordInput" value="{{password}}" label="password">
     </paper-input-decorator>
@@ -45,6 +45,16 @@ and password).
       <input type="text" name="identifier">
       <input type="password" name="password">
     </form>
+
+    <core-ajax
+      id="ajaxSubmit"
+      auto="false"
+      contentType="application/json"
+      method="POST"
+      response="{{ajaxResponse}}"
+      url="{{url}}"
+    >
+    </core-ajax>
   </template>
 
   <script>
@@ -52,7 +62,7 @@ and password).
     Polymer('login-box', {
       /**
        * The `heading` attribute sets an initial heading
-       * 
+       *
        * @attribute heading
        * @type string
        * @default 'Login'
@@ -61,7 +71,7 @@ and password).
 
       /**
        * The `submit` attribute sets an initial submit
-       * 
+       *
        * @attribute submit
        * @type string
        * @default 'Login'
@@ -70,7 +80,7 @@ and password).
 
       /**
        * The `identification` attribute sets an initial identification.
-       * 
+       *
        * @attribute identification
        * @type string
        * @default 'Username'
@@ -79,7 +89,7 @@ and password).
 
       /**
        * The `identifier` attribute sets an initial identifier.
-       * 
+       *
        * @attribute identifier
        * @type string
        * @default ''
@@ -88,20 +98,38 @@ and password).
 
       /**
        * The `password` attribute sets an initial password.
-       * 
+       *
        * @attribute password
        * @type string
        * @default ''
-       */      
+       */
       password: "",
       /**
        * The `action` url to send POST
-       * 
+       *
        * @attribute action
        * @type string
        * @default ''
        */
-      action: '',      
+      action: '',
+
+      /**
+       * The `ajax` attribute sets if call will by ajax
+       *
+       * @attribute ajax
+       * @type boolean
+       * @default false
+       */
+      ajax: false,
+
+      /**
+       * The `url` attribute sets URL to POST ajax. If ajax==true.
+       *
+       * @attribute url
+       * @type string
+       * @default ''
+       */
+      url: '',
 
       validate: function() {
         this.$.identifierInput.invalid = !!!this.identifier;
@@ -111,11 +139,11 @@ and password).
         this.fireLoginTry();
       },
       ready: function() {
-      
+
       },
       /**
        * The `shake` method will shake this element (negative behaviour).
-       * 
+       *
        * @method shake
        */
       shake: function() {
@@ -131,7 +159,7 @@ and password).
       /**
        * The `login-box-login-try` event is fired whenever we
        * call fireLoginTry
-       * 
+       *
        * @event login-box-login-try
        * @param {Object} detail
        *   @param {string} detail.identifier The identifying value (e.g. username)
@@ -140,7 +168,7 @@ and password).
 
       /**
        * The `fireLoginTry` method will fire the login try event.
-       * 
+       *
        * @method fireLoginTry
        */
       fireLoginTry: function() {
@@ -151,14 +179,30 @@ and password).
       },
       /**
        * The `go` to submit login-box
-       * 
+       *
        * @method go
-       */    
+       */
       sendTo: function() {
+        if (this.ajax) {
+          if (url != '') {
+            ajax = this.$.ajaxSubmit;
+            data = {}
+            data['identifier'] = this.identifier;
+            data['password'] = this.password;
+            ajax.body = JSON.stringify(data);
+            ajax.go();
+          } else {
+            console.error("ajax attribute is `true` but `url` is not defined!")
+          }
+        } else {
           this.$.form.elements[0].value = this.identifier;
           this.$.form.elements[1].value = this.password;
           this.$.form.submit();
-      }
+        }
+      },
+      ajaxResponseChanged: function () {
+        console.log(response);
+      },
     });
 
   </script>
