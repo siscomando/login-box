@@ -35,3 +35,10 @@ content[select="[top]"]::content img.radial {
 :host > h3 {
   margin-top: 5px;
 }
+
+paper-toast {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  color: yellow;
+}

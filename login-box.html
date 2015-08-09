@@ -2,6 +2,7 @@
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-input/paper-input-decorator.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../core-ajax/core-ajax.html">
 
 <!--
@@ -53,8 +54,8 @@ and password).
       method="POST"
       response="{{ajaxResponse}}"
       url="{{url}}"
-    >
-    </core-ajax>
+    ></core-ajax>
+    <paper-toast id="toast" text="{{toastMessage}}"></paper-toast>
   </template>
 
   <script>
@@ -131,6 +132,15 @@ and password).
        */
       url: '',
 
+      /**
+       * The `toastMessage` attribute sets message for toast
+       *
+       * @attribute toastMessage
+       * @type string
+       * @default ''
+       */
+      toastMessage: '',
+
       validate: function() {
         this.$.identifierInput.invalid = !!!this.identifier;
         this.$.passwordInput.invalid = !!!this.password;
@@ -139,7 +149,12 @@ and password).
         this.fireLoginTry();
       },
       ready: function() {
-
+        ajax = this.$.ajaxSubmit;
+        self = this;
+        ajax.addEventListener("core-error", function(){
+          // TODO: message into returned payload
+          self.toastWarning();
+        });
       },
       /**
        * The `shake` method will shake this element (negative behaviour).
@@ -184,7 +199,7 @@ and password).
        */
       sendTo: function() {
         if (this.ajax) {
-          if (url != '') {
+          if (this.url != '') {
             ajax = this.$.ajaxSubmit;
             data = {}
             data['identifier'] = this.identifier;
@@ -201,8 +216,18 @@ and password).
         }
       },
       ajaxResponseChanged: function () {
-        console.log(response);
+        var data = JSON.parse(this.ajaxResponse);
+        if ('token' in data.message) {
+            // TODO: #doc:account
+            window.localStorage.setItem("Account", JSON.stringify(data))
+            location.href = data.message._links;
+        }
       },
+     toastWarning: function() {
+       this.toastMessage = "Username or Password is invalid";
+       var toast = this.$.toast;
+       toast.opened = true;
+     }
     });
 
   </script>
